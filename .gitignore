@@ -1,0 +1,19 @@
+# Folder view configuration files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two underscores
+Icon?
+
+# Thumbnails
+._*
+
+# Files that might appear on external disks / network shares
+.Spotlight-V100
+.Trashes
+
+# Directories potential tools use
+.DocumentRevisions-V100
+.fseventsd
+.VolumeIcon.icns
