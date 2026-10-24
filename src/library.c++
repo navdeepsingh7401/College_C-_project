@@ -1,12 +1,15 @@
 #include <iostream>
 #include <string>
 #include "../include/library.h++"
+#include <mysqlx/xdevapi.h> 
 
 
 
-void library::addBook(){
-    // taking input 
+
+void library::addBook(mysqlx::Schema& db){
+
     std::cout << "==== Add Book  ====" << std::endl;
+
     std::cout << "Enter book Name        : ";
     getline(std::cin,bookName);
 
@@ -23,15 +26,19 @@ void library::addBook(){
     std::cout << "Book added successfully!" << std::endl;
     std::cout << std::endl;
 
-    // displaying the added book details
-    std::cout << "Book Name         : " << bookName << std::endl;
-    std::cout << "Book Auther Name  : " << autherName << std::endl;
-    std::cout << "Book bookID       : " << bookID << std::endl;
-    std::cout << "Book bookStock    : " << bookStock << " books"<< std::endl;
+    auto addBook = db.getTable("books");
+    addBook.insert("book_id","title","author","total_copies","available_copies")
+        .values(bookID,bookName,autherName,bookStock,bookStock)
+        .execute();
+
+    std::cout << std::endl;
+    std::cout << "Book details added successfully!" << std::endl;
+    std::cout << std::endl;
 }
 
+// fucnction for add Member 
 
-void library::addMember(){
+void library::addMember(mysqlx::Schema& db){
     // taking input 
     std::cout << "==== Add Member  ====" << std::endl;
     std::cout << "Enter Member Name  : ";
@@ -45,14 +52,16 @@ void library::addMember(){
 
 
 
+    auto addMembers = db.getTable("members");       // point to the data base tabe and store in the addMembers variable 
+    addMembers.insert("member_id","name","contact")     // using .insert("columName","columname") method to insert data 
+        .values(memberId,memberName,memberContact)      // use  .values(variable , virable )  to set variable 
+        .execute();  // execute the sql coe 
+
+
     std::cout << std::endl;
     std::cout << "Member details added successfully!" << std::endl;
     std::cout << std::endl;
 
-    // displaying the added Member details
-    std::cout << "Member Name   : " << memberName << std::endl;
-    std::cout << "Member ID     : " << memberId << std::endl;
-    std::cout << "Contact       : " << memberContact << std::endl;
 }
 
 
