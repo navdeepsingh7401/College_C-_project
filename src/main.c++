@@ -3,6 +3,7 @@
 #include <limits>
 #include "library.h++"
 #include "member.h++"
+#include <mysqlx/xdevapi.h>     // help to connect with data base provide api 
 using namespace std;
 
 int main() {
