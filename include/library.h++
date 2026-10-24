@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <mysqlx/xdevapi.h>
 
 
 class library{
@@ -21,6 +22,6 @@ class library{
 
     public:
     // member function 
-    void addBook();
-    void addMember();
+    void addBook(mysqlx::Schema& db);
+    void addMember(mysqlx::Schema& db);
 };
