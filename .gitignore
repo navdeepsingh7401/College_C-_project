@@ -19,6 +19,8 @@ Icon?
 .VolumeIcon.icns
 
 # Compiled C++ output
+/library
+/library.exe
 /main
 /main.exe
 /build/
