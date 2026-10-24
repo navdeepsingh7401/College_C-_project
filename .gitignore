@@ -17,3 +17,8 @@ Icon?
 .DocumentRevisions-V100
 .fseventsd
 .VolumeIcon.icns
+
+# Compiled C++ output
+/main
+/main.exe
+/build/
