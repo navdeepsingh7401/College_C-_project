@@ -6,6 +6,7 @@
 
 void library::addBook(){
     // taking input 
+    std::cout << "==== Add Book  ====" << std::endl;
     std::cout << "Enter book Name        : ";
     getline(std::cin,bookName);
 
@@ -32,11 +33,12 @@ void library::addBook(){
 
 void library::addMember(){
     // taking input 
+    std::cout << "==== Add Member  ====" << std::endl;
     std::cout << "Enter Member Name  : ";
     getline(std::cin,memberName);
 
     std::cout << "Enter  Member ID   : ";
-    std::cin >> memberID;
+    std::cin >> memberId;
 
     std::cout << "Enter Contact  +91 : ";
     std::cin >> memberContact;
@@ -47,9 +49,9 @@ void library::addMember(){
     std::cout << "Member details added successfully!" << std::endl;
     std::cout << std::endl;
 
-    // displaying the added book details
+    // displaying the added Member details
     std::cout << "Member Name   : " << memberName << std::endl;
-    std::cout << "Member ID     : " << memberID << std::endl;
+    std::cout << "Member ID     : " << memberId << std::endl;
     std::cout << "Contact       : " << memberContact << std::endl;
 }
 
