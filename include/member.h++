@@ -1,10 +1,9 @@
 #pragma once
-#include <string>
-
+#include <mysqlx/xdevapi.h>
 class member{
     public:
-    void bookIssue();
-    void bookReturn();
+    void bookIssue(mysqlx::Schema& db);
+    void bookReturn(mysqlx::Schema& db);
 
 
     protected:
