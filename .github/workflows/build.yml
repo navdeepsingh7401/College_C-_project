@@ -8,8 +8,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Install MySQL Connector/C++
+        run: brew install mysql-connector-c++
       - name: Compile
-        run: g++ -std=c++17 -Iinclude src/main.c++ src/library.c++ src/member.c++ -o library
+        run: |
+          connector_prefix="$(brew --prefix mysql-connector-c++)"
+          clang++ -std=c++17 -Wall -Wextra -Iinclude \
+            -I"$connector_prefix/include" \
+            src/main.c++ src/library.c++ src/member.c++ \
+            -L"$connector_prefix/lib" \
+            -Wl,-rpath,"$connector_prefix/lib" \
+            -lmysqlcppconnx -o library

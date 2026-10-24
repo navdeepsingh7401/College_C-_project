@@ -20,12 +20,9 @@ database/
 
 ## Libraries
 
-The project uses the C++ Standard Library and includes MySQL Connector/C++'s
-X DevAPI header. Database connectivity is not implemented in the application
-yet. Install the connector before compiling, and adjust its include path for
-your operating system if needed. VS Code's global
-`C_Cpp.default.includePath` setting should include the connector's `include`
-directory.
+The application uses the C++ Standard Library and MySQL Connector/C++'s X
+DevAPI. Install the connector before compiling. The application connects to a
+MySQL server through its X Protocol endpoint.
 
 ## MySQL schema
 
@@ -44,22 +41,28 @@ mysql -u your_username -p < database/add_registration_timestamps.sql
 ```
 
 Existing rows receive the time the migration is applied as their initial
-registration timestamp. The current C++ application does not connect to MySQL;
-the SQL files define and update the database structure.
+registration timestamp. The C++ application connects to the
+`library_management` schema through MySQL Connector/C++'s X DevAPI.
 
 ## Build and run
 
 From the project root:
 
 ```bash
+connector_prefix="$(brew --prefix mysql-connector-c++)"
 clang++ -std=c++17 -Wall -Wextra -Iinclude \
-  -I/opt/homebrew/opt/mysql-connector-c++/include \
+  -I"$connector_prefix/include" \
   src/main.c++ src/library.c++ src/member.c++ \
-  -L/opt/homebrew/opt/mysql-connector-c++/lib \
-  -Wl,-rpath,/opt/homebrew/opt/mysql-connector-c++/lib \
+  -L"$connector_prefix/lib" \
+  -Wl,-rpath,"$connector_prefix/lib" \
   -lmysqlcppconnx -o library
 ./library
 ```
 
-These connector paths are for Homebrew on Apple Silicon; adjust them for your
-installation. The compiled `library` executable is generated locally.
+Install the connector with Homebrew first if needed:
+
+```bash
+brew install mysql-connector-c++
+```
+
+The compiled `library` executable is generated locally.
