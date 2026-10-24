@@ -10,6 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Compile
         run: g++ -std=c++17 -Iinclude src/main.c++ src/library.c++ src/member.c++ -o library
