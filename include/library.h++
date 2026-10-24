@@ -1,11 +1,12 @@
 #pragma once
 #include <string>
+#include <vector>
 
 
 class library{
     // data member 
 
-    private:
+    protected:
     // book details
     std::string bookName;
     std::string autherName;
@@ -14,7 +15,7 @@ class library{
     // member details
 
     std::string memberName;
-    std::string memberID;
+    int memberId;
     std::string memberContact;
 
 
