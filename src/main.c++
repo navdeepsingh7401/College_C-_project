@@ -9,6 +9,18 @@ using namespace std;
 int main() {
     library l;
     member m;
+
+    // connecting database 
+
+try {
+        mysqlx::Session session(
+            "mysqlx://root:sumqes-jyGgi0-wodsuv@127.0.0.1:33060"
+        );
+    // connect variable with schema
+        auto db = session.getSchema("library_management");
+
+
+           //  operation menu
     int option;
 
     cout << "==== Operation ====" << endl;
@@ -25,24 +37,37 @@ int main() {
     switch (option)
     {
     case 1:
-        l.addMember();
+        l.addMember(db);
         break;
 
     case 2:
-        l.addBook();
+        l.addBook(db);
         break;
 
     case 3:
-        m.bookIssue();
+        m.bookIssue(db);
         break;
 
     case 4:
-        m.bookReturn();
+        m.bookReturn(db);
         break;
 
     default:
         cout << "please Select correct option " << endl;
         break;
     }
+
+
+
+
+    } catch (const mysqlx::Error& e) {
+        std::cerr << "MySQL error: " << e.what() << '\n';
+        return 1;
+    }
+
+
+
+
+ 
     return 0;
 }
