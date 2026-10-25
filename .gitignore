@@ -24,3 +24,6 @@ Icon?
 /main
 /main.exe
 /build/
+
+# Local database credentials
+.env
