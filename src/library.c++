@@ -144,3 +144,52 @@ void library::searchMembers(mysqlx::Schema& db){
                   << '\n';
     }
 }
+
+
+// =================================
+//        Update  Members info 
+// =================================
+
+
+
+
+void library::updateMembersInfo(mysqlx::Schema& db){
+    std::cout << "==== Update Member ====\n";
+    std::cout << "Enter Member ID: ";
+    std::cin >> memberId;
+
+    std::cout << "1. Update Name\n";
+    std::cout << "2. Update Contact\n";
+    std::cout << "Select option: ";
+    std::cin >> option;
+
+    auto members = db.getTable("members");
+
+    switch (option)
+    {
+    case 1:
+        std::cout << "Enter New Name: ";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::getline(std::cin, memberName);
+        members.update()
+            .set("name", memberName)
+            .where("member_id = :memberId")
+            .bind("memberId", memberId)
+            .execute();
+        break;
+    case 2:
+        std::cout << "Enter New Contact: ";
+        std::cin >> memberContact;
+        members.update()
+            .set("contact", memberContact)
+            .where("member_id = :memberId")
+            .bind("memberId", memberId)
+            .execute();
+        break;
+    default:
+        std::cout << "Please select option 1 or 2.\n";
+        return;
+    }
+
+    std::cout << "Member information updated successfully.\n";
+}
