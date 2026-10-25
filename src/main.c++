@@ -20,7 +20,7 @@ int main()
         // connect variable with schema
         auto db = session.getSchema("library_management");
 
-        int option = -1;
+        int option;
 
         std::cout << "\n========== Library Management ==========\n"
               << " 1. Add member             2. List members\n"
@@ -34,11 +34,7 @@ int main()
               << " 0. Exit\n";
 
         cout << "select option : ";
-        if (!(cin >> option))
-        {
-            std::cerr << "Invalid option. Please enter a number from 0 to 16.\n";
-            return 1;
-        }
+        cin >> option;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         switch (option)
@@ -53,7 +49,7 @@ int main()
             l.searchMembers(db);
             break;
         case 4:
-            cout << "Update member is not implemented yet.\n";
+            l.updateMembersInfo(db);
             break;
         case 5:
             cout << "Delete member is not implemented yet.\n";
