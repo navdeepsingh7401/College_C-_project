@@ -50,7 +50,7 @@ int main()
             l.showAllMembers(db);
             break;
         case 3:
-            cout << "Search members is not implemented yet.\n";
+            l.searchMembers(db);
             break;
         case 4:
             cout << "Update member is not implemented yet.\n";
