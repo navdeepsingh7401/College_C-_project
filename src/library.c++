@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
+#include <limits>
 #include "../include/library.h++"
-#include <mysqlx/xdevapi.h> 
-
-
+#include <mysqlx/xdevapi.h>
+#include <iomanip>
 
 
 void library::addBook(mysqlx::Schema& db){
@@ -39,23 +39,24 @@ void library::addBook(mysqlx::Schema& db){
 // fucnction for add Member 
 
 void library::addMember(mysqlx::Schema& db){
-    // taking input 
+    // taking input
     std::cout << "==== Add Member  ====" << std::endl;
-    std::cout << "Enter Member Name  : ";
-    getline(std::cin,memberName);
 
     std::cout << "Enter  Member ID   : ";
     std::cin >> memberId;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    std::cout << "Enter Member Name  : ";
+    getline(std::cin, memberName);
 
     std::cout << "Enter Contact  +91 : ";
     std::cin >> memberContact;
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-
-
-    auto addMembers = db.getTable("members");       // point to the data base tabe and store in the addMembers variable 
-    addMembers.insert("member_id","name","contact")     // using .insert("columName","columname") method to insert data 
-        .values(memberId,memberName,memberContact)      // use  .values(variable , virable )  to set variable 
-        .execute();  // execute the sql coe 
+    auto addMembers = db.getTable("members");
+    addMembers.insert("member_id","name","contact")
+        .values(memberId, memberName, memberContact)
+        .execute();
 
 
     std::cout << std::endl;
@@ -65,3 +66,36 @@ void library::addMember(mysqlx::Schema& db){
 }
 
 
+// =================================
+//        Show All Members
+// =================================
+
+
+void library::showAllMembers(mysqlx::Schema& db){
+
+
+    auto showAllMember = db.getTable("members");
+    auto result = showAllMember.select("member_id", "name", "contact").execute();
+    auto allRows = result.fetchAll();
+
+
+    std::cout << std::setw(30) << "Members List" << std::endl;
+    std::cout << std::string(55, '-') << '\n';
+
+    std::cout << std::left
+              << std::setw(12) << "Member ID"
+              << std::setw(20) << "Name"
+              << std::setw(15) << "Contact"
+              << '\n';
+
+    std::cout << std::string(55, '-') << '\n';
+
+    for (const auto &row : allRows)
+    {
+        std::cout << std::left
+                  << std::setw(12) << row[0].get<unsigned int>()
+                  << std::setw(20) << row[1].get<std::string>()
+                  << std::setw(15) << row[2].get<std::string>()
+                  << '\n';
+    }
+}
