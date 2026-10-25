@@ -14,8 +14,9 @@ src/
   library.c++   Add Book and Add member operations
   member.c++    Book issue and return operations
 database/
-  schema.sql                       MySQL database and table definitions
-  add_registration_timestamps.sql  Migration for an existing database
+  schema.sql                        MySQL database and table definitions
+  add_issue_date_default.sql        Migration for issue timestamps
+  add_registration_timestamps.sql   Migration for registration timestamps
 ```
 
 ## Libraries
@@ -44,6 +45,12 @@ Existing rows receive the time the migration is applied as their initial
 registration timestamp. The C++ application connects to the
 `library_management` schema through MySQL Connector/C++'s X DevAPI.
 
+For an existing database, run this migration once to make MySQL assign the
+current date and time when a book is issued:
+
+```bash
+mysql -u your_username -p < database/add_issue_date_default.sql
+```
 ## Build and run
 
 From the project root:
