@@ -14,9 +14,7 @@ src/
   library.c++   Add Book and Add member operations
   member.c++    Book issue and return operations
 database/
-  schema.sql                        MySQL database and table definitions
-  add_issue_date_default.sql        Migration for issue timestamps
-  add_registration_timestamps.sql   Migration for registration timestamps
+  schema.sql     Complete MySQL database and table definitions
 ```
 
 ## Libraries
@@ -27,30 +25,44 @@ MySQL server through its X Protocol endpoint.
 
 ## MySQL schema
 
-The schema creates a `library_management` database with tables for books,
-members, and book issue/return records. Run it with the MySQL command-line client:
+Run the single setup file `database/schema.sql` in MySQL Workbench. It creates
+the `library_management` database and all four tables used by the project:
+`books`, `members`, `book_issues`, and `returned_books`. It can also be run
+from the MySQL command line:
 
 ```bash
 mysql -u your_username -p < database/schema.sql
 ```
 
-If you already created the database using the earlier schema, run this
-migration once to add `registered_at` timestamps to the books and members:
+MySQL automatically fills `registered_at`, `issue_date`, and `return_date`
+using `DEFAULT CURRENT_TIMESTAMP`. The C++ app inserts only the book and
+member IDs for an issue or return, so it does not need to provide those dates.
+The schema's triggers also decrease available copies on issue, reject issues
+when no copies remain, and increase available copies on return.
+
+`CREATE TABLE IF NOT EXISTS` leaves existing tables unchanged. For an existing
+database, the script creates any missing tables, but it will not add timestamp
+columns or defaults to tables that already exist.
+
+## Database connection settings
+
+Copy `.env.example` to `.env` and set `DB_PASSWORD` to your MySQL password.
+The `.env` file is ignored by Git. Before running the application, load these
+settings into the shell environment:
 
 ```bash
-mysql -u your_username -p < database/add_registration_timestamps.sql
+cp .env.example .env
+# Edit .env and set DB_PASSWORD, then:
+set -a
+. ./.env
+set +a
+./library
 ```
 
-Existing rows receive the time the migration is applied as their initial
-registration timestamp. The C++ application connects to the
-`library_management` schema through MySQL Connector/C++'s X DevAPI.
+The application reads `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, and
+`DB_NAME` from the environment. `.env` files are not loaded automatically by
+C++; sourcing the file makes its values available to the program.
 
-For an existing database, run this migration once to make MySQL assign the
-current date and time when a book is issued:
-
-```bash
-mysql -u your_username -p < database/add_issue_date_default.sql
-```
 ## Build and run
 
 From the project root:
