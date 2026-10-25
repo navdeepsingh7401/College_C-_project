@@ -24,4 +24,5 @@ class library{
     // member function 
     void addBook(mysqlx::Schema& db);
     void addMember(mysqlx::Schema& db);
+    void showAllMembers(mysqlx::Schema& db);
 };
