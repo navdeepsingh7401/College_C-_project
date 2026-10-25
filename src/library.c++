@@ -99,3 +99,48 @@ void library::showAllMembers(mysqlx::Schema& db){
                   << '\n';
     }
 }
+
+
+
+
+
+
+
+// =================================
+//        Search  Members
+// =================================
+
+
+void library::searchMembers(mysqlx::Schema& db){
+
+    std::cout << "Enter Member id : ";
+    std::cin >> memberId;
+
+    auto searchMembers = db.getTable("members");
+    auto result = searchMembers.select("*")
+    .where("member_id = :memberId")
+    .bind("memberId", memberId)
+    .execute();
+    auto allRows = result.fetchAll();
+
+
+    std::cout << std::setw(30) << " Search  Members List" << std::endl;
+    std::cout << std::string(55, '-') << '\n';
+
+    std::cout << std::left
+              << std::setw(12) << "Member ID"
+              << std::setw(20) << "Name"
+              << std::setw(15) << "Contact"
+              << '\n';
+
+    std::cout << std::string(55, '-') << '\n';
+
+    for (const auto &row : allRows)
+    {
+        std::cout << std::left
+                  << std::setw(12) << row[0].get<unsigned int>()
+                  << std::setw(20) << row[1].get<std::string>()
+                  << std::setw(15) << row[2].get<std::string>()
+                  << '\n';
+    }
+}
