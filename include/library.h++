@@ -11,7 +11,7 @@ class library{
     // book details
     std::string bookName;
     std::string autherName;
-    int bookID , bookStock;
+    int bookID , bookStock, option;
 
     // member details
 
@@ -26,4 +26,5 @@ class library{
     void addMember(mysqlx::Schema& db);
     void showAllMembers(mysqlx::Schema& db);
     void searchMembers(mysqlx::Schema& db);
+    void updateMembersInfo(mysqlx::Schema& db);
 };
