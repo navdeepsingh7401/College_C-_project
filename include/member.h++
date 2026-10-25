@@ -5,6 +5,10 @@ class member{
     void bookIssue(mysqlx::Schema& db);
     void bookReturn(mysqlx::Schema& db);
 
+    
+    void totalBookReturn(mysqlx::Schema& db);
+    void totalBookissue(mysqlx::Schema& db);
+
 
     protected:
     // bookIssue 
