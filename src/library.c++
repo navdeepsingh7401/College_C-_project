@@ -2,6 +2,7 @@
 #include <string>
 #include <limits>
 #include "library.h++"
+#include "input.h++"
 #include <mysqlx/xdevapi.h>
 #include <iomanip>
 
@@ -14,21 +15,13 @@ void library::addBook(mysqlx::Schema& db){
 
     std::cout << "==== Add Book  ====" << std::endl;
 
-    std::cout << "Enter book Name        : ";
-    getline(std::cin,bookName);
-
-    std::cout << "Enter book Auther Name : ";
-    getline(std::cin,autherName);
-
-    std::cout << "Enter book bookID      : ";
-    std::cin >> bookID;
-
-    std::cout << "Enter book bookStock   : ";
-    std::cin >> bookStock;
-
-    std::cout << std::endl;
-    std::cout << "Book added successfully!" << std::endl;
-    std::cout << std::endl;
+    if (!input::readText("Enter book name        : ", bookName) ||
+        !input::readText("Enter book author name : ", autherName) ||
+        !input::readInteger("Enter book ID          : ", bookID) ||
+        !input::readInteger("Enter book stock       : ", bookStock, 0))
+    {
+        return;
+    }
 
     auto addBook = db.getTable("books");
     addBook.insert("book_id","title","author","total_copies","available_copies")
@@ -48,16 +41,12 @@ void library::addMember(mysqlx::Schema& db){
     // taking input
     std::cout << "==== Add Member  ====" << std::endl;
 
-    std::cout << "Enter  Member ID   : ";
-    std::cin >> memberId;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-
-    std::cout << "Enter Member Name  : ";
-    getline(std::cin, memberName);
-
-    std::cout << "Enter Contact  +91 : ";
-    std::cin >> memberContact;
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    if (!input::readInteger("Enter member ID   : ", memberId) ||
+        !input::readText("Enter member name : ", memberName) ||
+        !input::readText("Enter contact     : ", memberContact))
+    {
+        return;
+    }
 
     auto addMembers = db.getTable("members");
     addMembers.insert("member_id","name","contact")
@@ -119,15 +108,22 @@ void library::showAllMembers(mysqlx::Schema& db){
 
 void library::searchMembers(mysqlx::Schema& db){
 
-    std::cout << "Enter Member id : ";
-    std::cin >> memberId;
+    if (!input::readInteger("Enter member ID: ", memberId))
+    {
+        return;
+    }
 
     auto searchMembers = db.getTable("members");
     auto result = searchMembers.select("*")
     .where("member_id = :memberId")
     .bind("memberId", memberId)
     .execute();
-    auto allRows = result.fetchAll();
+    auto row = result.fetchOne();
+    if (!row)
+    {
+        std::cout << "No member found with that ID.\n";
+        return;
+    }
 
 
     std::cout << std::setw(30) << " Search  Members List" << std::endl;
@@ -141,14 +137,11 @@ void library::searchMembers(mysqlx::Schema& db){
 
     std::cout << std::string(55, '-') << '\n';
 
-    for (const auto &row : allRows)
-    {
-        std::cout << std::left
-                  << std::setw(12) << row[0].get<unsigned int>()
-                  << std::setw(20) << row[1].get<std::string>()
-                  << std::setw(15) << row[2].get<std::string>()
-                  << '\n';
-    }
+    std::cout << std::left
+              << std::setw(12) << row[0].get<unsigned int>()
+              << std::setw(20) << row[1].get<std::string>()
+              << std::setw(15) << row[2].get<std::string>()
+              << '\n';
 }
 
 
@@ -161,37 +154,58 @@ void library::searchMembers(mysqlx::Schema& db){
 
 void library::updateMembersInfo(mysqlx::Schema& db){
     std::cout << "==== Update Member ====\n";
-    std::cout << "Enter Member ID: ";
-    std::cin >> memberId;
+    if (!input::readInteger("Enter Member ID: ", memberId))
+    {
+        return;
+    }
 
     std::cout << "1. Update Name\n";
     std::cout << "2. Update Contact\n";
-    std::cout << "Select option: ";
-    std::cin >> option;
+    if (!input::readInteger("Select option: ", option))
+    {
+        return;
+    }
 
     auto members = db.getTable("members");
 
     switch (option)
     {
     case 1:
-        std::cout << "Enter New Name: ";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::getline(std::cin, memberName);
-        members.update()
+    {
+        if (!input::readText("Enter New Name: ", memberName))
+        {
+            return;
+        }
+        auto result = members.update()
             .set("name", memberName)
             .where("member_id = :memberId")
             .bind("memberId", memberId)
             .execute();
+        if (result.getAffectedItemsCount() == 0)
+        {
+            std::cout << "Member not found or the name is unchanged.\n";
+            return;
+        }
         break;
+    }
     case 2:
-        std::cout << "Enter New Contact: ";
-        std::cin >> memberContact;
-        members.update()
+    {
+        if (!input::readText("Enter New Contact: ", memberContact))
+        {
+            return;
+        }
+        auto contactResult = members.update()
             .set("contact", memberContact)
             .where("member_id = :memberId")
             .bind("memberId", memberId)
             .execute();
+        if (contactResult.getAffectedItemsCount() == 0)
+        {
+            std::cout << "Member not found or the contact is unchanged.\n";
+            return;
+        }
         break;
+    }
     default:
         std::cout << "Please select option 1 or 2.\n";
         return;
@@ -205,8 +219,10 @@ void library::updateMembersInfo(mysqlx::Schema& db){
 // =================================
 
 void library::deleteMember(mysqlx::Schema& db){
-    std::cout << "Enter Member ID to delete: ";
-    std::cin >> memberId;
+    if (!input::readInteger("Enter Member ID to delete: ", memberId))
+    {
+        return;
+    }
 
     auto issues = db.getTable("book_issues").select("issue_id")
         .where("member_id = :memberId")
@@ -246,8 +262,10 @@ void library::deleteMember(mysqlx::Schema& db){
 // =================================
 
 void library::updateBook(mysqlx::Schema& db){
-    std::cout << "Enter Book ID: ";
-    std::cin >> bookID;
+    if (!input::readInteger("Enter Book ID: ", bookID))
+    {
+        return;
+    }
 
     auto books = db.getTable("books");
     auto bookResult = books.select("book_id")
@@ -265,15 +283,18 @@ void library::updateBook(mysqlx::Schema& db){
     std::cout << "1. Update Title\n";
     std::cout << "2. Update Author\n";
     std::cout << "3. Update Total Copies\n";
-    std::cout << "Select option: ";
-    std::cin >> option;
+    if (!input::readInteger("Select option: ", option))
+    {
+        return;
+    }
 
     switch (option)
     {
     case 1:
-        std::cout << "Enter New Title: ";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::getline(std::cin, bookName);
+        if (!input::readText("Enter New Title: ", bookName))
+        {
+            return;
+        }
         books.update()
             .set("title", bookName)
             .where("book_id = :bookID")
@@ -281,9 +302,10 @@ void library::updateBook(mysqlx::Schema& db){
             .execute();
         break;
     case 2:
-        std::cout << "Enter New Author: ";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        std::getline(std::cin, autherName);
+        if (!input::readText("Enter New Author: ", autherName))
+        {
+            return;
+        }
         books.update()
             .set("author", autherName)
             .where("book_id = :bookID")
@@ -292,8 +314,10 @@ void library::updateBook(mysqlx::Schema& db){
         break;
     case 3:
     {
-        std::cout << "Enter New Total Copies: ";
-        std::cin >> bookStock;
+        if (!input::readInteger("Enter New Total Copies: ", bookStock, 0))
+        {
+            return;
+        }
 
         auto result = books.select("total_copies", "available_copies")
             .where("book_id = :bookID")
@@ -305,7 +329,7 @@ void library::updateBook(mysqlx::Schema& db){
         unsigned int availableCopies = copies[1].get<unsigned int>();
         unsigned int checkedOutCopies = totalCopies - availableCopies;
 
-        if (bookStock < 0 || static_cast<unsigned int>(bookStock) < checkedOutCopies)
+        if (static_cast<unsigned int>(bookStock) < checkedOutCopies)
         {
             std::cout << "Total copies cannot be less than the number currently checked out.\n";
             return;
@@ -333,8 +357,10 @@ void library::updateBook(mysqlx::Schema& db){
 // =================================
 
 void library::showMemberHistory(mysqlx::Schema& db){
-    std::cout << "Enter Member ID: ";
-    std::cin >> memberId;
+    if (!input::readInteger("Enter Member ID: ", memberId))
+    {
+        return;
+    }
 
     auto members = db.getTable("members");
     auto memberResult = members.select("member_id", "name")

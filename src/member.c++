@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "../include/member.h++"
+#include "../include/input.h++"
 #include <mysqlx/xdevapi.h>
 #include <iomanip>
 
@@ -12,15 +13,39 @@ void member::bookIssue(mysqlx::Schema &db)
 {
     std::cout << "==== Book Issue ====" << std::endl;
 
-    std::cout << "Enter Issue book : ";
-    std::cin >> bookId;
+    if (!input::readInteger("Enter book ID: ", bookId) ||
+        !input::readInteger("Enter member ID: ", memberId))
+    {
+        return;
+    }
 
-    std::cout << "Issue Member ID : ";
-    std::cin >> memberId;
+    auto books = db.getTable("books");
+    auto bookResult = books.select("available_copies")
+        .where("book_id = :bookId")
+        .bind("bookId", bookId)
+        .execute();
+    auto book = bookResult.fetchOne();
+    if (!book)
+    {
+        std::cout << "Book not found.\n";
+        return;
+    }
+    if (book[0].get<unsigned int>() == 0)
+    {
+        std::cout << "No copies of that book are currently available.\n";
+        return;
+    }
 
-    std::cout << std::endl;
-
-    // execute sql
+    auto members = db.getTable("members");
+    auto memberResult = members.select("member_id")
+        .where("member_id = :memberId")
+        .bind("memberId", memberId)
+        .execute();
+    if (!memberResult.fetchOne())
+    {
+        std::cout << "Member not found.\n";
+        return;
+    }
 
     auto issues = db.getTable("book_issues");
     issues.insert("book_id", "member_id")
@@ -36,13 +61,68 @@ void member::bookReturn(mysqlx::Schema &db)
 {
     std::cout << "==== Book Return ====\n";
 
-    std::cout << "Enter book ID: ";
-    std::cin >> bookId;
+    if (!input::readInteger("Enter book ID: ", bookId) ||
+        !input::readInteger("Enter member ID: ", memberId))
+    {
+        return;
+    }
 
-    std::cout << "Enter member ID: ";
-    std::cin >> memberId;
+    auto books = db.getTable("books");
+    auto bookResult = books.select("book_id")
+        .where("book_id = :bookId")
+        .bind("bookId", bookId)
+        .execute();
+    if (!bookResult.fetchOne())
+    {
+        std::cout << "Book not found.\n";
+        return;
+    }
+
+    auto members = db.getTable("members");
+    auto memberResult = members.select("member_id")
+        .where("member_id = :memberId")
+        .bind("memberId", memberId)
+        .execute();
+    if (!memberResult.fetchOne())
+    {
+        std::cout << "Member not found.\n";
+        return;
+    }
+
+    auto issues = db.getTable("book_issues");
+    auto issueResult = issues.select("issue_id")
+        .where("book_id = :bookId AND member_id = :memberId")
+        .bind("bookId", bookId)
+        .bind("memberId", memberId)
+        .execute();
+    auto issueRows = issueResult.fetchAll();
 
     auto returns = db.getTable("returned_books");
+    auto returnResult = returns.select("return_id")
+        .where("book_id = :bookId AND member_id = :memberId")
+        .bind("bookId", bookId)
+        .bind("memberId", memberId)
+        .execute();
+    auto returnRows = returnResult.fetchAll();
+
+    std::size_t issueCount = 0;
+    for (const auto &row : issueRows)
+    {
+        (void)row;
+        ++issueCount;
+    }
+    std::size_t returnCount = 0;
+    for (const auto &row : returnRows)
+    {
+        (void)row;
+        ++returnCount;
+    }
+
+    if (returnCount >= issueCount)
+    {
+        std::cout << "This member has no active checkout for that book.\n";
+        return;
+    }
 
     returns.insert("book_id", "member_id")
         .values(bookId, memberId)
