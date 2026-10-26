@@ -18,7 +18,7 @@ jobs:
           connector_prefix="$(brew --prefix mysql-connector-c++)"
           clang++ -std=c++17 -Wall -Wextra -Iinclude \
             -I"$connector_prefix/include" \
-            src/main.c++ src/library.c++ src/member.c++ \
+            src/main.c++ src/library.c++ src/member.c++ src/report.c++ \
             -L"$connector_prefix/lib" \
             -Wl,-rpath,"$connector_prefix/lib" \
             -lmysqlcppconnx -o library

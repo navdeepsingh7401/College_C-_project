@@ -6,6 +6,7 @@
 #include <string>
 #include "library.h++"
 #include "member.h++"
+#include "report.h++"
 #include <mysqlx/xdevapi.h>
 
 namespace
@@ -60,6 +61,7 @@ int main()
                       << "11. Check out book        12. Return book\n"
                       << "13. Active loans          14. Returned loans\n"
                       << "15. Overdue loans / fines 16. Member history\n"
+                      << "17. Export reports\n"
                       << " 0. Exit\n"
                       << "Select an option: ";
 
@@ -73,7 +75,7 @@ int main()
                 std::cin.clear();
                 std::cin.ignore(
                     std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "Please enter a number from 0 to 16.\n";
+                std::cout << "Please enter a number from 0 to 17.\n";
                 continue;
             }
             std::cin.ignore(
@@ -131,12 +133,15 @@ int main()
                 case 16:
                     libraryManager.showMemberHistory(db);
                     break;
+                case 17:
+                    exportReport(db);
+                    break;
                 case 0:
                     std::cout << "Goodbye!\n";
                     running = false;
                     break;
                 default:
-                    std::cout << "Please select a valid option from 0 to 16.\n";
+                    std::cout << "Please select a valid option from 0 to 17.\n";
                     break;
                 }
             }

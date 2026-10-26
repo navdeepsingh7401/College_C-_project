@@ -73,6 +73,14 @@ returned-loan report shows the same fine for late returns. Because the current
 schema records returns by book and member rather than by issue ID, reports pair
 each return with the oldest checkout of that same book by that member.
 
+## Export reports
+
+Choose **17. Export reports** from the application menu, then choose Books,
+Members, Checkout records, or Return records. Reports can be exported as CSV,
+tab-separated text, or JSON. Enter a file name without an extension; the app
+adds the correct extension and saves the file in the current working directory.
+Existing files are not overwritten.
+
 ## Build and run
 
 From the project root:
@@ -81,7 +89,7 @@ From the project root:
 connector_prefix="$(brew --prefix mysql-connector-c++)"
 clang++ -std=c++17 -Wall -Wextra -Iinclude \
   -I"$connector_prefix/include" \
-  src/main.c++ src/library.c++ src/member.c++ \
+  src/main.c++ src/library.c++ src/member.c++ src/report.c++ \
   -L"$connector_prefix/lib" \
   -Wl,-rpath,"$connector_prefix/lib" \
   -lmysqlcppconnx -o library
