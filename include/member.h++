@@ -4,8 +4,9 @@ class member{
     public:
     void bookIssue(mysqlx::Schema& db);
     void bookReturn(mysqlx::Schema& db);
-
-    
+    void showActiveLoans(mysqlx::Schema& db);
+    void showReturnedLoans(mysqlx::Schema& db);
+    void showOverdueLoans(mysqlx::Schema& db);
     void totalBookReturn(mysqlx::Schema& db);
     void totalBookissue(mysqlx::Schema& db);
 
