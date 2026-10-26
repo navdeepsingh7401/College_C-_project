@@ -1,18 +1,18 @@
 # Library Management Project
 
-A simple console-based C++ library management application. It lets users add
-books and members, and enter book issue and return details.
+A console-based C++ library management application. It can manage books and
+members, record checkouts and returns, and show loan history and overdue fines.
 
 ## Code structure
 
 ```text
 include/
-  library.h++   Library class declaration
-  member.h++    Member class declaration
+  library.h++   Book and member operation declarations
+  member.h++    Checkout and loan-report declarations
 src/
-  main.c++      Menu and program entry point
-  library.c++   Add Book and Add member operations
-  member.c++    Book issue and return operations
+  main.c++      Menu, database settings, and program entry point
+  library.c++   Book and member management
+  member.c++    Checkouts, returns, and loan reports
 database/
   schema.sql     Complete MySQL database and table definitions
 ```
@@ -61,7 +61,17 @@ set +a
 
 The application reads `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`, and
 `DB_NAME` from the environment. `.env` files are not loaded automatically by
-C++; sourcing the file makes its values available to the program.
+C++; source the file to make its values available to the program. Defaults are
+`root`, an empty password, `127.0.0.1`, port `33060`, and
+`library_management`.
+
+## Loans and fines
+
+The overdue report includes active and returned checkouts held for more than
+30 calendar days. The fine is Rs. 10 for each day after those 30 days. The
+returned-loan report shows the same fine for late returns. Because the current
+schema records returns by book and member rather than by issue ID, reports pair
+each return with the oldest checkout of that same book by that member.
 
 ## Build and run
 
