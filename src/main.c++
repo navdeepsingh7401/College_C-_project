@@ -37,6 +37,10 @@ int main()
         cin >> option;
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
+        // =================================
+        //          Menu Option Dispatch
+        // =================================
+
         switch (option)
         {
         case 1:
@@ -52,7 +56,7 @@ int main()
             l.updateMembersInfo(db);
             break;
         case 5:
-            cout << "Delete member is not implemented yet.\n";
+            l.deleteMember(db);
             break;
         case 6:
             l.addBook(db);
@@ -64,7 +68,7 @@ int main()
             cout << "Search books is not implemented yet.\n";
             break;
         case 9:
-            cout << "Update book is not implemented yet.\n";
+            l.updateBook(db);
             break;
         case 10:
             cout << "Delete book is not implemented yet.\n";
@@ -85,7 +89,7 @@ int main()
             cout << "Overdue loans is not implemented yet.\n";
             break;
         case 16:
-            cout << "Member history is not implemented yet.\n";
+            l.showMemberHistory(db);
             break;
         case 0:
             cout << "Goodbye!\n";

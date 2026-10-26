@@ -27,4 +27,7 @@ class library{
     void showAllMembers(mysqlx::Schema& db);
     void searchMembers(mysqlx::Schema& db);
     void updateMembersInfo(mysqlx::Schema& db);
+    void deleteMember(mysqlx::Schema& db);
+    void updateBook(mysqlx::Schema& db);
+    void showMemberHistory(mysqlx::Schema& db);
 };
