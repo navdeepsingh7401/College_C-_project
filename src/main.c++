@@ -59,8 +59,8 @@ int main()
                       << " 7. List books             8. Search books\n"
                       << " 9. Update book           10. Delete book\n"
                       << "11. Check out book        12. Return book\n"
-                      << "13. Active loans          14. Returned loans\n"
-                      << "15. Overdue loans / fines 16. Member history\n"
+                      << "13. Active Fine           14. Returned Fine\n"
+                      << "15. Overdue fines         16. Member history\n"
                       << "17. Export reports\n"
                       << " 0. Exit\n"
                       << "Select an option: ";

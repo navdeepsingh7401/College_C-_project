@@ -54,7 +54,7 @@ LoanRecords loadLoanRecords(mysqlx::Schema &db)
     auto issueResult = issues.select(
             "issue_id", "book_id", "member_id",
             "DATE_FORMAT(issue_date, '%Y-%m-%d') AS issue_day",
-            "DATEDIFF(CURRENT_DATE, issue_date) AS days_held")
+            "DATEDIFF(CURRENT_DATE(), issue_date) AS days_held")
         .orderBy("issue_id")
         .execute();
     auto issueRows = issueResult.fetchAll();
@@ -81,7 +81,7 @@ LoanRecords loadLoanRecords(mysqlx::Schema &db)
     auto returnResult = returns.select(
             "book_id", "member_id",
             "DATE_FORMAT(return_date, '%Y-%m-%d') AS return_day")
-        .orderBy("return_id")
+        .orderBy("return_date")
         .execute();
     auto returnRows = returnResult.fetchAll();
     std::map<std::pair<unsigned int, unsigned int>, std::size_t> nextIssue;

@@ -230,7 +230,7 @@ void library::deleteMember(mysqlx::Schema& db){
         .execute();
     auto issue = issues.fetchOne();
 
-    auto returns = db.getTable("returned_books").select("return_id")
+    auto returns = db.getTable("returned_books").select("member_id")
         .where("member_id = :memberId")
         .bind("memberId", memberId)
         .execute();
