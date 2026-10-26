@@ -258,6 +258,78 @@ void library::deleteMember(mysqlx::Schema& db){
 }
 
 // =================================
+//              List Books
+// =================================
+
+void library::showAllBooks(mysqlx::Schema& db)
+{
+    auto books = db.getTable("books");
+    auto result = books.select(
+        "book_id", "title", "author", "total_copies", "available_copies")
+        .orderBy("title")
+        .execute();
+    auto rows = result.fetchAll();
+
+    std::cout << "\nBooks in the library\n"
+              << std::left
+              << std::setw(10) << "Book ID"
+              << std::setw(28) << "Title"
+              << std::setw(24) << "Author"
+              << std::setw(10) << "Copies"
+              << "Available\n";
+    std::cout << std::string(82, '-') << '\n';
+
+    bool found = false;
+    for (const auto &row : rows)
+    {
+        found = true;
+        std::cout << std::left
+                  << std::setw(10) << row[0].get<unsigned int>()
+                  << std::setw(28) << row[1].get<std::string>()
+                  << std::setw(24) << row[2].get<std::string>()
+                  << std::setw(10) << row[3].get<unsigned int>()
+                  << row[4].get<unsigned int>() << '\n';
+    }
+    if (!found)
+    {
+        std::cout << "No books have been added yet.\n";
+    }
+}
+
+// =================================
+//             Search Books
+// =================================
+
+void library::searchBooks(mysqlx::Schema& db)
+{
+    if (!input::readInteger("Enter Book ID: ", bookID))
+    {
+        return;
+    }
+
+    auto books = db.getTable("books");
+    auto result = books.select(
+        "book_id", "title", "author", "total_copies", "available_copies")
+        .where("book_id = :bookID")
+        .bind("bookID", bookID)
+        .execute();
+    auto row = result.fetchOne();
+
+    if (!row)
+    {
+        std::cout << "No book found with that ID.\n";
+        return;
+    }
+
+    std::cout << "\nBook details\n"
+              << "ID: " << row[0].get<unsigned int>() << '\n'
+              << "Title: " << row[1].get<std::string>() << '\n'
+              << "Author: " << row[2].get<std::string>() << '\n'
+              << "Total copies: " << row[3].get<unsigned int>() << '\n'
+              << "Available copies: " << row[4].get<unsigned int>() << '\n';
+}
+
+// =================================
 //             Update Book
 // =================================
 
@@ -350,6 +422,42 @@ void library::updateBook(mysqlx::Schema& db){
     }
 
     std::cout << "Book information updated successfully.\n";
+}
+
+// =================================
+//              Delete Book
+// =================================
+
+void library::deleteBook(mysqlx::Schema& db)
+{
+    if (!input::readInteger("Enter Book ID to delete: ", bookID))
+    {
+        return;
+    }
+
+    auto issues = db.getTable("book_issues").select("issue_id")
+        .where("book_id = :bookID")
+        .bind("bookID", bookID)
+        .execute();
+    if (issues.fetchOne())
+    {
+        std::cout << "Cannot delete a book with checkout history.\n";
+        return;
+    }
+
+    auto books = db.getTable("books");
+    auto result = books.remove()
+        .where("book_id = :bookID")
+        .bind("bookID", bookID)
+        .execute();
+
+    if (result.getAffectedItemsCount() == 0)
+    {
+        std::cout << "Book not found.\n";
+        return;
+    }
+
+    std::cout << "Book deleted successfully.\n";
 }
 
 // =================================
